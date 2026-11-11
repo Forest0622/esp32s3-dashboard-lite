@@ -15,6 +15,7 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "sd_card.h"
+#include "mirror.h"
 #include "ui.h"
 
 static const char *TAG = "DASH";
@@ -573,6 +574,8 @@ void app_main(void)
 
     xTaskCreate(wifi_scan_task, "wifi_scan", 4096, NULL, 4, NULL);
 
+    mirror_start();     /* 屏幕镜像：TCP 3232，见 mirror.c */
+
     int64_t last_tick = now_ms();
     int64_t last_render = 0;
     int last_page = -1;
@@ -592,6 +595,7 @@ void app_main(void)
         if (t - last_render > 250 || t - last_tick > 5000) {
             update_link_rssi();
             render();
+            mirror_notify();
             last_render = t;
         }
         if (t - last_tick > 60000) {          /* 每 60s 自动重扫一次 */

@@ -28,6 +28,23 @@
 
 底部固定提示：`K0:PAGE  K1:LED  K2:SCAN`
 
+## 屏幕镜像（把屏上画面投到 Mac/PC）
+
+固件内置镜像服务：把整帧 RGB565 做 RLE 后经 **TCP 3232** 推给局域网内的电脑，静态画面每 5 秒补一帧心跳，画面不变不发送。
+
+电脑端用配套的 `esp32_mirror_viewer.py`（在 `esp32-screen-mirror` 目录里，零依赖，双击 `启动屏幕镜像.command` 即可）：
+
+```bash
+/usr/bin/python3 esp32_mirror_viewer.py 192.168.101.23   # 板子在 1 号页显示的 IP
+```
+
+浏览器会打开 `http://127.0.0.1:8080` 实时显示，`+/-` 缩放、`f` 全屏。协议：
+
+```
+握手: 'M','I','R','1' | u16 w | u16 h | u8 bpp=2 | u8 fmt=1(RLE)
+每帧: u32 payload_len | payload(若干 u16 count + u16 rgb565)
+```
+
 ## 按键
 
 | 按键 | XL9555 位 | 功能 |
